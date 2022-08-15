@@ -17,11 +17,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { BrowserRouter as Router, Link } from "react-router-dom";
 
 import useRequestResource from "src/hooks/useRequestResource";
+import ColorBox from "src/components/ColorBox";
 
 
 export const Categories = () => {
   const {getResourceList,resourceList, deleteResource}=useRequestResource({
-    endpoint:"categories"
+    endpoint:"categories", resourceLabel:"Category"
   })
   const [open,setOpen]=useState(false);
   const [idToDelete,setIdToDelete]=useState(null)
@@ -78,7 +79,7 @@ export const Categories = () => {
               return (
                 <TableRow key={r.id}>
                   <TableCell align="left">{r.name}</TableCell>
-                  <TableCell align="left">{r.color}</TableCell>
+                  <TableCell align="left"><ColorBox color={`#${r.color}`}/></TableCell>
                   <TableCell align="right">
                   <Box sx={{display:"flex", justifyContent:"flex-end"}}>
                     <Link to={`/categories/edit/${r.id}`} key="category-edit">

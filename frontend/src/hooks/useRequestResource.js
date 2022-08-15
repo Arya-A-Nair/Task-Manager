@@ -1,83 +1,128 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useContext } from "react";
 import axios from "axios";
+import { useSnackbar } from "notistack";
+import formatHttpApiError from "src/helpers/formatHttpApiError";
+import { LoadingOverlayResourceContext } from "src/components/LoadingOverlayResource";
 
-export default function useRequestResource({
-    endpoint
-}){
-    const [resourceList, setResourceList]=useState({
-        results:[]
-    })
-    const [resource,setResource]=useState(null)
+export default function useRequestResource({ endpoint, resourceLabel }) {
+  const [resourceList, setResourceList] = useState({
+    results: [],
+  });
+  const [resource, setResource] = useState(null);
+  const { enqueueSnackbar } = useSnackbar();
+  const [error, setError] = useState(null);
+  const loadingOverlay = useContext(LoadingOverlayResourceContext);
+  const { setLoading } = loadingOverlay;
 
-    const getResourceList=useCallback(()=>{
-        axios.get(`api/${endpoint}/`)
-        .then((res)=>{
-            setResourceList({
-                results:res.data
-            })
-            .catch((err)=>{
-                console.log(err)
-            })
+  const handleRequestResourceError = useCallback((err) => {
+    const formattedError = formatHttpApiError(err);
+    setLoading(false);
+    setError(formattedError);
+    enqueueSnackbar(formattedError);
+  });
+
+  const getResourceList = useCallback(() => {
+    setLoading(true);
+    axios
+      .get(`api/${endpoint}/`)
+      .then((res) => {
+        setResourceList({
+          results: res.data,
+        });
+        setLoading(false);
+      })
+      .catch((err) => {
+        handleRequestResourceError(err);
+      });
+  }, [endpoint]);
+
+  const addResource = useCallback(
+    (values, successCallback) => {
+      setLoading(true);
+      axios
+        .post(`/api/${endpoint}/`, values)
+        .then(() => {
+          enqueueSnackbar(`${resourceLabel} added`);
+          if (successCallback) {
+            successCallback();
+          }
+          setLoading(false);
         })
-    },[endpoint])
+        .catch((e) => {
+          handleRequestResourceError(e);
+        });
+    },
+    [endpoint, enqueueSnackbar]
+  );
 
+  const getResource = useCallback(
+    (id) => {
+      setLoading(true);
+      axios
+        .get(`/api/${endpoint}/${id}/`)
+        .then((res) => {
+          setLoading(false);
 
-    const addResource=useCallback((values,successCallback)=>{
-        axios.post(`/api/${endpoint}/`,values)
-        .then(()=>{
-            if(successCallback){
-                successCallback()
-            }
-        }).catch((e)=>{
-            console.log(e)
+          const { data } = res;
+          setResource(data);
         })
-    })
+        .catch((e) => {
+          handleRequestResourceError(e);
+        });
+    },
+    [endpoint]
+  );
 
-    const getResource=useCallback((id)=>{
-        axios.get(`/api/${endpoint}/${id}/`)
-        .then((res)=>{
-            const {data}=res;
-            setResource(data)
-        })
-        .catch(e=>{
-            console.log(e)
-        })
-    },[endpoint])
+  const updateResource = useCallback(
+    (id, values, successCallback) => {
+      setLoading(true);
+      axios
+        .patch(`/api/${endpoint}/${id}/`, values)
+        .then(() => {
+          setLoading(false);
 
-    const updateResource=useCallback((id,values,successCallback)=>{
-        axios.patch(`/api/${endpoint}/${id}/`, values)
-        .then(()=>{
-            if(successCallback){
-                successCallback();
-            }
-        }).catch((e)=>{
-            console.log(e)
+          enqueueSnackbar(`${resourceLabel} Updated`);
+          if (successCallback) {
+            successCallback();
+          }
         })
-    }, [endpoint])
+        .catch((e) => {
+          handleRequestResourceError(e);
+        });
+    },
+    [endpoint]
+  );
 
-    const deleteResource=useCallback((id)=>{
-        axios.delete(`/api/${endpoint}/${id}`)
-        .then(()=>{
-            const newResourceList={
-                results:resourceList.results.filter((r)=>{
-                    return r.id!==id
-                })
-            }
-            setResourceList(newResourceList)
-        })
-        .catch((err)=>{
-            console.log(err)
-        })
-    },[endpoint,resourceList])
+  const deleteResource = useCallback(
+    (id) => {
+      setLoading(true);
+      axios
+        .delete(`/api/${endpoint}/${id}`)
+        .then(() => {
+          setLoading(false);
 
-    return {
-        resourceList,
-        getResourceList,
-        addResource,
-        getResource,
-        resource,
-        updateResource,
-        deleteResource
-    }
+          enqueueSnackbar(`${resourceLabel} Deleted`);
+          const newResourceList = {
+            results: resourceList.results.filter((r) => {
+              return r.id !== id;
+            }),
+          };
+          setResourceList(newResourceList);
+        })
+        .catch((err) => {
+          handleRequestResourceError(err);
+        });
+    },
+    [endpoint, resourceList]
+  );
+
+  return {
+    resourceList,
+    getResourceList,
+    addResource,
+    getResource,
+    resource,
+    updateResource,
+    deleteResource,
+  };
 }
-

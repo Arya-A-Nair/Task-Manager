@@ -5,25 +5,38 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Box } from "@mui/material";
 import { Categories } from "./pages/categories";
 import CategoryDetails from "./pages/categories/CategoryDetails";
+import { SnackbarProvider } from "notistack";
+import { LoadingOverlayResource } from "./components/LoadingOverlayResource";
 
 export default function App() {
   return (
     <div>
       <CssBaseline />
-      <Router>
-        <Box
-          sx={{
-            bgcolor: (theme) => theme.palette.background.default,
-            minHeight: "100vh",
-          }}
-        >
-          <Routes>
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/categories/create" element={<CategoryDetails />} />
-            <Route path="/categories/edit/:id" element={<CategoryDetails />} />
-          </Routes>
-        </Box>
-      </Router>
+      <LoadingOverlayResource>
+        <SnackbarProvider>
+          <Router>
+            <Box
+              sx={{
+                bgcolor: (theme) => theme.palette.background.default,
+                minHeight: "100vh",
+                width:"100%"
+              }}
+            >
+              <Routes>
+                <Route path="/categories" element={<Categories />} />
+                <Route
+                  path="/categories/create"
+                  element={<CategoryDetails />}
+                />
+                <Route
+                  path="/categories/edit/:id"
+                  element={<CategoryDetails />}
+                />
+              </Routes>
+            </Box>
+          </Router>
+        </SnackbarProvider>
+      </LoadingOverlayResource>
     </div>
   );
 }
