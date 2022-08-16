@@ -6,7 +6,7 @@ export const LoadingOverlayResourceContext=React.createContext({
     setLoading:()=>{}
 })
 
-export const LoadingOverlayResource = ({children}) => {
+export default function LoadingOverlayResource({children}){
     const [loading,setLoading]=useState(false)
     const overlayValue=useMemo(()=>{
         return {setLoading}
