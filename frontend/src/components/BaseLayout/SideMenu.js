@@ -2,7 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
-
+import DashboardIcon from "@mui/icons-material/Dashboard"
+import ListAltIcon from "@mui/icons-material/ListAlt"
 import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
@@ -19,11 +20,23 @@ const drawerWidth = 240;
 
 const listItems = [
     {
+        key:"dashboard",
+        to:"/",
+        name:"Dashboard",
+        icon:<DashboardIcon/>
+    },
+    {
+        key:"tasks",
+        to:"/tasks",
+        name:"Tasks",
+        icon:<ListAltIcon/>
+    } ,
+    {
         key: "categories",
         to: "/categories",
         name: "Categories",
         icon: <CategoryIcon />,
-    },
+    }
 ];
 
 const SidebarGlobalStyles = () => {

@@ -3,6 +3,7 @@ from .serializers import CategorySerializer, TaskSerializer
 from .models import Category, Task
 from rest_framework import viewsets, permissions, filters
 from rest_framework.pagination import PageNumberPagination
+from .permissions import TaskPermission
 
 
 # Create your views here.
@@ -22,7 +23,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         serializer.save(created_by=self.request.user)
 
 class TaskViewSet(viewsets.ModelViewSet):
-    permission_classes=[permissions.IsAuthenticated]
+    permission_classes=[permissions.IsAuthenticated,TaskPermission]
     serializer_class=TaskSerializer
     pagination_class=StandardResultSetPagination
     filter_backends=[
@@ -30,8 +31,8 @@ class TaskViewSet(viewsets.ModelViewSet):
         filters.OrderingFilter
     ]
     search_fields=['title']
-    ordering_fields=['completed']
-    ordering=['completed']
+    ordering_fields=['completed','-created_at']
+    ordering=['completed','-created_at']
 
     def get_queryset(self):
         user=self.request.user
