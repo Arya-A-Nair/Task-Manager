@@ -1,7 +1,12 @@
-import React from 'react'
+import React from "react";
+import TaskCompletion from "./TaskCompletion";
+import TaskByCategory from "./TasksByCategory";
 
 export default function Dashboard() {
   return (
-    <div>Dashboard</div>
-  )
+    <div>
+      <TaskCompletion />
+      <TaskByCategory />
+    </div>
+  );
 }
