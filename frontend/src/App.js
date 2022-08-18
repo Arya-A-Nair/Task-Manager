@@ -14,9 +14,11 @@ import { RequireAuth } from "./components/RequireAuth";
 import { RequireNotAuth } from "./components/RequireNotAuth";
 import BaseLayout from "./components/BaseLayout";
 import Tasks from "./pages/Tasks";
-import  TaskDetails  from "./pages/Tasks/TaskDetails";
+import TaskDetails from "./pages/Tasks/TaskDetails";
 import Dashboard from "./pages/Dashboard";
-import './index.css'
+import "./index.css";
+import RequestResetPassword from "./pages/Auth/RequestResetPassword";
+import ResetPasswordConfirm from "./pages/Auth/ResetPasswordConfirm";
 export default function App() {
   return (
     <div>
@@ -46,12 +48,20 @@ export default function App() {
                     <Route path="/tasks" element={<Tasks />} />
                     <Route path="/tasks/create" element={<TaskDetails />} />
                     <Route path="/tasks/edit/:id" element={<TaskDetails />} />
-                    <Route path="/" element={<Dashboard/>}/>
+                    <Route path="/" element={<Dashboard />} />
                   </Route>
                 </Route>
                 <Route element={<RequireNotAuth />}>
                   <Route path="/auth/signup" element={<SignUp />} />
+                  <Route
+                    path="/auth/password-reset"
+                    element={<RequestResetPassword />}
+                  />
                   <Route path="/auth/signin" element={<SignIn />} />
+                  <Route
+                    path="/auth/password-reset/confirm/:uid/:token"
+                    element={<ResetPasswordConfirm />}
+                  />
                 </Route>
               </Routes>
             </Box>

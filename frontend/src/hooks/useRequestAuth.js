@@ -23,6 +23,36 @@ export default function useRequestAuth() {
     [enqueueSnackbar, setLoading, setError]
   );
 
+  const requestResetPassword=useCallback((email,successCallback)=>{
+    setLoading(true);
+    axios.post("/api/auth/users/reset_password/",{
+      email
+    }).then(()=>{
+      setLoading(false)
+      enqueueSnackbar("Reset Password link will be sent to provided email")
+      if(successCallback){
+        successCallback();
+      }
+    }).catch((err)=>{
+      handleRequestError(err)
+    })
+  }, [enqueueSnackbar,handleRequestError])
+
+  const resetPassword=useCallback((data,successCallback)=>{
+    setLoading(true)
+    axios.post('api/auth/users/reset_password_confirm/', data)
+    .then(()=>{
+      enqueueSnackbar("Successfully updated password")
+      setLoading(false)
+      if(successCallback){
+        successCallback();
+      }
+    })
+    .catch((err)=>{
+      handleRequestError(err)
+    })
+  },[enqueueSnackbar,handleRequestError])
+
   const login = useCallback(
     ({ username, password }, successCallback) => {
       setLoading(true);
@@ -87,6 +117,8 @@ export default function useRequestAuth() {
     error,
     login,
     logoutPending,
-    logout
+    logout,
+    requestResetPassword,
+    resetPassword
   };
 }
